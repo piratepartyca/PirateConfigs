@@ -1,0 +1,9 @@
+server {
+        listen 127.0.0.1:69;
+        server_name 7izeec6bqnn4rvuo.onion;
+
+    location / {
+                proxy_pass             https://www.pirateparty.ca/;
+                proxy_set_header       Host www.pirateparty.ca;
+        }
+}

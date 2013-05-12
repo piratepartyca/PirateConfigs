@@ -1,0 +1,17 @@
+server {
+        listen 192.95.44.164:80;
+        server_name www.piratepad.ca piratepad.ca;
+        rewrite        ^ https://$server_name$request_uri? permanent;
+}
+server {
+        listen 192.95.44.164:443;
+        server_name www.piratepad.ca piratepad.ca;
+        ssl                  on;
+        ssl_certificate      /etc/nginx/ssl/www.piratepad.ca.pem;
+        ssl_certificate_key  /etc/nginx/ssl/www.piratepad.ca.key;
+
+    location / {
+                proxy_pass             http://localhost:9001;
+                proxy_buffering off;
+        }
+}

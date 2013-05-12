@@ -1,0 +1,16 @@
+server {
+        listen 192.95.44.165:80;
+        server_name tpb.pirateparty.ca;
+        rewrite        ^ https://$server_name$request_uri? permanent;
+}
+server {
+        listen 192.95.44.165:443;
+        server_name tpb.pirateparty.ca;
+        ssl                  on;
+		ssl_certificate      /etc/nginx/ssl/*.pirateparty.ca.pem;
+		ssl_certificate_key  /etc/nginx/ssl/*.pirateparty.ca.key;
+
+		location / {
+            proxy_pass             http://91.121.194.115:82/; #TPB IP not used as it is blocked from our IP block for some strange reason            proxy_set_header       Host thepiratebay.sx;
+        }
+}

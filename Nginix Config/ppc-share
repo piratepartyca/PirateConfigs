@@ -1,0 +1,41 @@
+server {
+        listen 192.95.44.167:80;
+        server_name www.sharable.ca  sharable.ca;
+        rewrite        ^ https://$server_name$request_uri? permanent;
+}
+server {
+        listen 192.95.44.167:443;
+        server_name www.sharable.ca sharable.ca;
+        root /var/www/ppc-share;
+        index index.php;
+        ssl                  on;
+    ssl_certificate      /etc/nginx/ssl/www.sharable.ca.pem;
+    ssl_certificate_key  /etc/nginx/ssl/www.sharable.ca.key;
+
+        location = /favicon.ico {
+                        log_not_found off;
+                        access_log off;
+        }
+
+        location = /robots.txt {
+                        allow all;
+                        log_not_found off;
+                        access_log off;
+        }
+
+        location / {
+                        try_files $uri $uri/ /index.php?$args;
+        }
+
+    location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass  127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME /var/www/ppc-share$fastcgi_script_name;
+    }
+
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                        expires max;
+                        log_not_found off;
+        }
+}

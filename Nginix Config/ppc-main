@@ -1,0 +1,65 @@
+server {
+        listen 192.95.44.162:80;
+        server_name www.pirateparty.ca pirateparty.ca;
+        rewrite        ^ https://$server_name$request_uri? permanent;
+
+}
+server {
+        listen 192.95.44.162:443;
+        server_name www.pirateparty.ca pirateparty.ca;
+        root /var/www/ppc-main;
+        index index.php;
+        ssl                  on;
+        ssl_certificate      /etc/nginx/ssl/*.pirateparty.ca.pem;
+        ssl_certificate_key  /etc/nginx/ssl/*.pirateparty.ca.key;
+        ssl_session_timeout  5m;
+        ssl_protocols  SSLv2 SSLv3 TLSv1;
+        ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+        ssl_prefer_server_ciphers   on;
+        ssl_verify_depth 1;
+
+        location = /favicon.ico {
+                        log_not_found off;
+                        access_log off;
+        }
+
+        location = /robots.txt {
+                        allow all;
+                        log_not_found off;
+                        access_log off;
+        }
+
+        location / {
+                        try_files $uri $uri/ /index.php?$args;
+        }
+
+        location ~ \.php$ {
+                include /etc/nginx/fastcgi_params;
+                fastcgi_pass  127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME /var/www/ppc-main$fastcgi_script_name;
+                fastcgi_param HTTPS on;
+        }
+
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                expires max;
+                log_not_found off;
+        }
+
+        location /phpmyadmin {
+                root /usr/share/;
+                index index.php index.html index.htm;
+                location ~ ^/phpmyadmin/(.+\.php)$ {
+                        try_files $uri =404;
+                        root /usr/share/;
+                        fastcgi_pass 127.0.0.1:9000;
+                        fastcgi_index index.php;
+                        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                        fastcgi_param HTTPS on;
+                        include /etc/nginx/fastcgi_params;
+                }
+                location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+                        root /usr/share/;
+                }
+        }
+}
